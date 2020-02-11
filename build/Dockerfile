@@ -1,4 +1,3 @@
-ARG GOLANG_CONTAINER=golang:latest
 
 FROM nginx:1.17.8 AS base
 
@@ -38,13 +37,12 @@ FROM base AS local
 COPY nginx-ingress /
 
 
-FROM $GOLANG_CONTAINER AS builder
-ARG VERSION
-ARG GIT_COMMIT
+FROM golang:latest AS builder
 WORKDIR /go/src/github.com/nginxinc/kubernetes-ingress/nginx-ingress/cmd/nginx-ingress
 COPY . /go/src/github.com/nginxinc/kubernetes-ingress/nginx-ingress/
 RUN CGO_ENABLED=0 GOFLAGS='-mod=vendor' \
-	go build -installsuffix cgo -ldflags "-w -X main.version=${VERSION} -X main.gitCommit=${GIT_COMMIT}" -o /nginx-ingress
+	go build -installsuffix cgo -ldflags "-w -X main.version=VERSION -X
+main.gitCommit=COMMIT" -o /nginx-ingress
 
 
 FROM base AS container
